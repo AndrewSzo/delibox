@@ -24,6 +24,8 @@
                         <p class="text-center mt-3">
                             Already have an account? <a href="/login/?next={{ request.GET.next }}"><b>Login</b></a>
                         </p>
+                        <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.GET.next }}"
+                           class="btn btn-outline-primary btn-block">Login with Facebook</a>
                     </form>
                 </div>
             </div>
