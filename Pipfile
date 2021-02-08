@@ -31,6 +31,7 @@ sqlparse = "==0.4.1"
 urllib3 = "==1.26.3"
 Django = "==3.1.6"
 PyJWT = "==2.0.1"
+pipfile = "*"
 
 [dev-packages]
 
