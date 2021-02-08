@@ -7,6 +7,7 @@ from core.courier import views as courier_views
 
 customer_urlpatters = [
     path('', customer_views.customer_page, name='home'),
+    path('profile/', customer_views.profile_page, name='profile'),
 ]
 
 courier_urlpatters = [
