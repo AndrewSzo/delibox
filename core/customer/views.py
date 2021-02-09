@@ -2,6 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from core.customer import forms
+from django.contrib.auth.models import User, Group
+from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 
 @login_required()
@@ -12,13 +16,36 @@ def customer_page(request):
 @login_required(login_url='/login/?next=/customer/')
 def profile_page(request):
     user_form = forms.BasicUserForm(instance=request.user)
+    customer_form = forms.BasicCustomerForm(instance=request.user.customer)
+    password_form = PasswordChangeForm(request.user)
 
-    if request.mentod == 'POST':
-        user_form = forms.BasicUserForm(request.POST, instance=request.user)
-        if user_form.is_valid():
-            user_form.save()
-            return redirect(reverse('customer:profile'))
+    if request.method == 'POST':
 
-    return render(request, 'customer/profile.html', {'user_form': user_form})
+        if request.POST.get('action') == 'update_profile':
+            user_form = forms.BasicUserForm(request.POST, instance=request.user)
+            customer_form = forms.BasicCustomerForm(request.POST, request.FILES, instance=request.user.customer)
+
+            if user_form.is_valid() and customer_form.is_valid():
+                user_form.save()
+                customer_form.save()
+
+                messages.success(request, 'Your profile has been updated')
+                return redirect(reverse('customer:profile'))
+
+        elif request.POST.get('action') == 'update_password':
+            password_form = PasswordChangeForm(request.POST, request.user)
+
+            if password_form.is_valid():
+                user_password = password_form.save()
+                update_session_auth_hash(request, user_password)
+
+                messages.success(request, 'Your password has been updated')
+                return redirect(reverse('customer:profile'))
+
+    return render(request, 'customer/profile.html', {
+        'user_form': user_form,
+        'customer_form': customer_form,
+        'password_form': password_form,
+    })
 
 

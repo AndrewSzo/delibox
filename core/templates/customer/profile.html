@@ -1,17 +1,129 @@
 {% extends 'customer/customer_base.html' %}
 {% load bootstrap4 %}
 
+{% block head %}
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-auth.js"></script>
+
+<!-- Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-analytics.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  var firebaseConfig = {
+    apiKey: "AIzaSyDtin5dx7tC80Z3WcsKi_mVHpJcmHzvIVM",
+    authDomain: "delibox-e6be3.firebaseapp.com",
+    projectId: "delibox-e6be3",
+    storageBucket: "delibox-e6be3.appspot.com",
+    messagingSenderId: "1055003237219",
+    appId: "1:1055003237219:web:547f8ca03bb81f07d91156",
+    measurementId: "G-F2SR9MNMY4"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
+{% endblock %}
+
 {% block main %}
+
+<!-- BASIC INFORMATION -->
 <b class="tezt-secondar">Basic Information</b>
 <br>
 <div class="card bg-white mt-2 mb-5">
     <div class="card-body">
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {% bootstrap_form user_form %}
+            {% bootstrap_form customer_form %}
             <input type="hidden" name="action" value="update_profile">
             <button type="submit" class="btn btn-warning">Save</button>
         </form>
     </div>
 </div>
+<!-- /BASIC INFORMATION -->
+
+<!-- CHANGE PASSWORD -->
+<b class="tezt-secondar">Change Password</b>
+<br>
+<div class="card bg-white mt-2 mb-5">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form password_form %}
+            <input type="hidden" name="action" value="update_password">
+            <button type="submit" class="btn btn-warning">Save</button>
+        </form>
+    </div>
+</div>
+<!-- /CHANGE PASSWORD -->
+
+<!-- MOBILE NUMBER -->
+<b class="tezt-secondar">Mobile Number</b>
+<br>
+<div class="card bg-white mt-2 mb-5 ">
+    <div class="card-body">
+
+        <div id="recaptcha-container"></div>
+
+        <div id='get-code' class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Your Phone Number" >
+            <button class="btn btn-warning">Send Code</button>
+        </div>
+        <div id='verify-code' class="input-group mb-3 d-none">
+            <input type="text" class="form-control" placeholder="Verification Code"  >
+            <button class="btn btn-warning">Verify Code</button>
+        </div>
+    </div>
+</div>
+<!-- /MOBILE NUMBER -->
+
+<script>
+
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+
+    $("#get-code button").on('click', function(){
+        const phoneNumber = $("#get-code input").val();
+        console.log(phoneNumber);
+
+        firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+        .then((confirmationResult) => {
+            // SMS sent. Prompt user to type the code from the message, then sign the
+            // user in with confirmationResult.confirm(code).
+            console.log(confirmationResult)
+            window.confirmationResult = confirmationResult;
+         // ...
+                $("#get-code").addClass("d-none");
+                $("#verify-code").removeClass("d-none");
+        }).catch((error) => {
+            // Error; SMS not sent
+            toast(error.message, 'error');
+        });
+
+
+
+    });
+
+        $("#verify-code button").on('click', function(){
+        const code = $("#verify-code input").val();
+        console.log(code);
+
+        confirmationResult.confirm(code).then((result) => {
+            // User signed in successfully.
+            const user = result.user;
+            // ...
+            console.log(user.phoneNumber);
+            user.getIdToken().then(function(idToken){
+                console.log(idToken);
+            });
+        }).catch((error) => {
+            // User couldn't sign in (bad verification code?)
+            toast(error.message, 'error');
+        });
+
+    });
+</script>
 {% endblock %}
