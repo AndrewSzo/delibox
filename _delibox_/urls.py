@@ -7,12 +7,13 @@ from core import views
 from core.customer import views as customer_views
 from core.courier import views as courier_views
 
-customer_urlpatters = [
+customer_urlpatterns = [
     path('', customer_views.customer_page, name='home'),
     path('profile/', customer_views.profile_page, name='profile'),
+    path('create_job/', customer_views.create_job_page, name='create_job'),
 ]
 
-courier_urlpatters = [
+courier_urlpatterns = [
     path('', courier_views.courier_page, name='home'),
 ]
 
@@ -24,8 +25,8 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name="login.html")),
     path('logout/', auth_views.LogoutView.as_view(next_page="/")),
     path('register/', views.register_page),
-    path('customer/', include((customer_urlpatters, 'customer'))),
-    path('courier/', include((courier_urlpatters, 'courier'))),
+    path('customer/', include((customer_urlpatterns, 'customer'))),
+    path('courier/', include((courier_urlpatterns, 'courier'))),
 ]
 
 if settings.DEBUG:

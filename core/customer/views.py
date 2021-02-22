@@ -49,3 +49,6 @@ def profile_page(request):
     })
 
 
+@login_required(login_url='/login/?next=/customer/')
+def create_job_page(request):
+    return render(request, 'customer/create_job.html', {})
